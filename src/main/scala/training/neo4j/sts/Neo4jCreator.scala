@@ -10,22 +10,53 @@ case class Neo4jCreator(
                         user: String,
                         password: String) extends GraphDatabase{
 
+  val driver: Driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password))
+  val session: Session = driver.session()
+
   def runCypherQuery(query:String) : List[Record] = {
 
-    //TODO Handle the case where the query is null
-    val driver: Driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password))
-    val transaction: Transaction = driver.session().beginTransaction()
-
-    transaction.run(query).list().asScala.toList
-  }
-
-  def runCypherQueries(queries: List[String]) : List[List[Record]] = {
-
-    //TODO Create a type for queries
-    queries.map(q=>runCypherQuery(q))
+   session.run(query).list().asScala.toList
 
   }
+
+
+  //Create constraint on the node id
+  def createConstraint():Unit = {
+
+    session.run(("CREATE CONSTRAINT ON (c:Component) ASSERT c.id IS UNIQUE"))
+
+  }
+
+
+  def writeComponent(components: List[Component]): Unit = {
+
+    components.foreach(c=>
+      session.run(
+        s"MERGE (:Component {" +
+          s"id:'${c.id}'," +
+          s"own_state: '${c.own_state}'," +
+          s"derived_state:'${c.derived_state}'," +
+          s"depends_on:'${c.depends_on}'," +
+          s"dependency_of:'${c.dependency_of}'})"
+      ))
+  }
+
+  def writeDependencyRelation(components: List[Component]) = {
+
+    components.foreach(c=>
+      c.depends_on.foreach(d=>
+        session.run(
+          s"MERGE(c1:Component{id:'${c.id}'})" +
+            s"MERGE(c2:Component{id:'${d}'})" +
+            s"MERGE(c1)-[:DEPENDS_ON]->(c2)"
+        )
+      )
+    )
+
+  }
+
 
 
 
 }
+
