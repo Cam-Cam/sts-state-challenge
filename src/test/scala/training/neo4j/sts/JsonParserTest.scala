@@ -7,11 +7,11 @@ import scala.io.Source
 class JsonParserTest extends FunSuite {
 
   test("parse initial file") {
-println(JsonParser.readFile("src/test/ressources/initial.json"))
+println(JsonParser.readInitFile("src/test/ressources/initial.json"))
   }
 
   test("extract component") {
-    val jvalue = JsonParser.readFile("src/test/ressources/initial.json")
+    val jvalue = JsonParser.readInitFile("src/test/ressources/initial.json")
 
     println(JsonParser.createComponent(jvalue))
 
