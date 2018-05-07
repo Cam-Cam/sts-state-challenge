@@ -10,7 +10,7 @@ build.sbt
 *.iml
 *.ipr
 *.iws
-.idea
+.idea*
 
 # mac
 .DS_Store
