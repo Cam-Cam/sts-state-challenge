@@ -21,9 +21,14 @@ case class Neo4jCreator(
 
 
   //Create constraint on the node id
-  def createConstraint():Unit = {
+  def createConstraints():Unit = {
 
-    session.run(("CREATE CONSTRAINT ON (c:Component) ASSERT c.id IS UNIQUE"))
+    session.run((
+      "CREATE CONSTRAINT ON (c:Component) ASSERT c.id IS UNIQUE "))
+
+    session.run((
+        "CREATE CONSTRAINT ON (ch:Check) ASSERT ch.id IS UNIQUE"
+      ))
 
   }
 
@@ -41,13 +46,35 @@ case class Neo4jCreator(
       ))
   }
 
+  def writeChecks(components: List[Component]) = {
+
+    components.foreach(c=>
+      c.check_states.foreach(
+        cs=>session.run(s"MERGE(:Check {id:'${cs._1}'})"))
+    )
+
+  }
+
+  def writeStates(components: List[Component]) = {
+
+    components.foreach(c=>
+      c.check_states.foreach(cs=>
+        session.run(
+          s"MERGE(check1:Check {id:'${cs._1}'}) " +
+          s"MERGE(c1:Component{id:'${c.id}'}) " +
+          s"MERGE(check1)-[:${cs._2}]->(c1)"
+        )
+      )
+    )
+  }
+
   def writeDependencyRelation(components: List[Component]) = {
 
     components.foreach(c=>
       c.depends_on.foreach(d=>
         session.run(
-          s"MERGE(c1:Component{id:'${c.id}'})" +
-            s"MERGE(c2:Component{id:'${d}'})" +
+          s"MERGE(c1:Component{id:'${c.id}'}) " +
+            s"MERGE(c2:Component{id:'${d}'}) " +
             s"MERGE(c1)-[:DEPENDS_ON]->(c2)"
         )
       )
