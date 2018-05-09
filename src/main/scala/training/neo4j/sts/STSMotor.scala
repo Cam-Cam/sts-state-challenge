@@ -8,10 +8,11 @@ import scala.collection.JavaConverters._
 case class STSMotor(
                          uri: String,
                         user: String,
-                        password: String) extends GraphDatabase{
+                        password: String) {
 
   val driver: Driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password))
   val session: Session = driver.session()
+
 
   def runCypherQuery(query:String) : List[Record] = {
 
