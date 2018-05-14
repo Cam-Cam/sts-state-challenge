@@ -1,2 +1,0 @@
-MATCH (n) RETURN n
-MATCH(n) WHERE n.name="app" RETURN n.name
