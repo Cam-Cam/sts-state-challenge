@@ -12,54 +12,67 @@ case class STSMotor(
 
   val driver: Driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password))
 
-  val session: Session = driver.session()
+  //val tx: Transaction = session.beginTransaction()
 
   val sortedStateList: List[String] = List("alert","warning","clear","no_data")
 
   def runCypherQuery(query:String) : List[Record] = {
 
+    val session: Session = driver.session()
    session.run(query).list().asScala.toList
+
 
   }
 
   //Initialize Graph
-  def init(components: List[Component]): Unit ={
+  def init(components: List[Component]): Unit = {
 
-    //Delete nodes, relations and constraints
-    List("Component","Check").foreach(n=>{
-      session.writeTransaction(tx=>tx.run(Neo4jQueries.deleteNode(n)))
-      session.writeTransaction(tx=>tx.run(Neo4jQueries.deleteConstraints(n,"id")))}
-    )
+    val schemaUpdateSession: Session = driver.session()
 
+    //Delete all constraints
+    schemaUpdateSession.writeTransaction(tx =>{
+      tx.run(Neo4jQueries.deleteAllConstraints())
     //Write constraints
-    session.writeTransaction(tx=>tx.run(Neo4jQueries.createConstraint("Component","id")))
-    session.writeTransaction(tx=>tx.run(Neo4jQueries.createConstraint("Check","id")))
-
-    components.foreach(c=> {
-      //Write components
-      session.writeTransaction(tx =>{tx.run(Neo4jQueries.writeComponent(c))}
-      )
-
-      //Write dependencies
-      //Dependencies are represented as a list of components inside the current component
-      c.depends_on.foreach(d =>{
-        session.writeTransaction(tx=>tx.run(Neo4jQueries.writeRelation(c.id, d,"Component","Component","DEPENDS_ON")))
-
-      } )
-
-      //Write Check_states
-      //1-Create Check labels on nodes
-      //2-Create State relations
-      c.check_states.foreach(cs => {
-        session.writeTransaction(tx => tx.run(Neo4jQueries.writeChecks(cs._1)))
-        session.writeTransaction(tx => tx.run(Neo4jQueries.createState(c, cs._1, cs._2)))
-      })
-
-
+    tx.run(Neo4jQueries.createConstraint("Component", "id"))
+    tx.run(Neo4jQueries.createConstraint("Check", "id"))
     })
+
+    schemaUpdateSession.close()
+
+    val dataUpdateSession: Session = driver.session()
+
+    dataUpdateSession.writeTransaction(tx => {
+      List("Component", "Check").foreach(n => {
+        //For each component
+        components.foreach(c => {
+          //Write components
+          tx.run(Neo4jQueries.writeComponent(c))
+
+          //Write dependencies
+          //Dependencies are represented as a list of components inside the current component
+          c.depends_on.foreach(d => {
+            tx.run(Neo4jQueries.writeRelation(c.id, d, "Component", "Component", "DEPENDS_ON"))
+          })
+
+          //Write Check_states
+          //1-Create Check labels on nodes
+          //2-Create State relations
+          c.check_states.foreach(cs => {
+            tx.run(Neo4jQueries.writeChecks(cs._1))
+            tx.run(Neo4jQueries.createState(c, cs._1, cs._2))
+
+          })
+        })
+      })
+    })
+
+    dataUpdateSession.close()
+
   }
 
   def update(events: List[Event],components: List[Component]) ={
+
+    val session: Session = driver.session()
 
     //For each event
     //First step - delete existing events relations between component and check
@@ -76,6 +89,8 @@ case class STSMotor(
       val newState = worstState(sortedStateList,c)
       session.writeTransaction(tx => tx.run(Neo4jQueries.UpdateOwnState(c,newState)))
     })
+
+    session.close()
 
   }
 

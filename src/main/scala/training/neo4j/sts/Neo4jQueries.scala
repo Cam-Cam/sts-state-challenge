@@ -4,15 +4,14 @@ import org.neo4j.driver.v1.{StatementResult, Transaction}
 
 object Neo4jQueries {
 
-  def  constraintErrorQuery() = {
+  def  constraintLongQuery() = {
 
-    s"CREATE (c:Component {id:'app'})"
-
+    s"CALL apoc.util.sleep(20000)" // wait for 20 seconds
 
   }
 
   def createConstraint(node: String, key: String): String = {
-    s"CREATE CONSTRAINT ON (n:${node}) ASSERT n.${key} IS UNIQUE "
+    s"CREATE CONSTRAINT ON (n:${node}) ASSERT n.${key} IS UNIQUE"
   }
 
   def writeComponent(component: Component): String = {
@@ -50,5 +49,8 @@ object Neo4jQueries {
   def UpdateOwnState(component: Component,newState: String): String = {
     s"MATCH (c:Component)" + s"WHERE c.id='${component.id}'" + s"SET c.own_state = '${newState}'"
   }
+
+  def deleteAllConstraints()= "CALL apoc.schema.assert({},{})"
+
 
 }
