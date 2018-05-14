@@ -51,15 +51,15 @@ case class STSMotor(
           //Write dependencies
           //Dependencies are represented as a list of components inside the current component
           c.depends_on.foreach(d => {
-            tx.run(Neo4jQueries.writeRelation(c.id, d, "Component", "Component", "DEPENDS_ON"))
+            tx.run(Neo4jQueries.writeRelation("Component",c.id,"Component", d, "DEPENDS_ON"))
           })
 
           //Write Check_states
           //1-Create Check labels on nodes
           //2-Create State relations
           c.check_states.foreach(cs => {
-            tx.run(Neo4jQueries.writeChecks(cs._1))
-            tx.run(Neo4jQueries.createState(c, cs._1, cs._2))
+            tx.run(Neo4jQueries.writeCheck(cs._1))
+            tx.run(Neo4jQueries.writeRelation("Component",c.id,"Check",cs._1,cs._2))
 
           })
         })
@@ -72,25 +72,32 @@ case class STSMotor(
 
   def update(events: List[Event],components: List[Component]) ={
 
-    val session: Session = driver.session()
+    val sessionToUpdateRelationsSession: Session = driver.session()
+    val sessionToUpdateOwnState: Session = driver.session()
 
-    //For each event
-    //First step - delete existing events relations between component and check
-    //Second step - create new events relations between component and check
-    events.foreach(e=>{
-      session.writeTransaction(tx => tx.run(Neo4jQueries.deleteState(e)))
-      session.writeTransaction(tx => tx.run(Neo4jQueries.writeRelation(e.check_state,e.component,"Check","Component", e.state)))
+    sessionToUpdateRelationsSession.writeTransaction(tx => {
+      //For each event
+      //First step - delete existing events relations between component and check
+      //Second step - create new events relations between component and check
+      events.foreach(e => {
+        tx.run(Neo4jQueries.deleteStateRelation(e))
+        tx.run(Neo4jQueries.writeRelation("Check", e.check_state, "Component", e.component, e.state))
+      })
     })
 
-    //For each component
-    //First step - calculate the new state
-    //Second step - Update the own state with the new state
-    components.foreach(c=>{
-      val newState = worstState(sortedStateList,c)
-      session.writeTransaction(tx => tx.run(Neo4jQueries.UpdateOwnState(c,newState)))
+    sessionToUpdateRelationsSession.close()
+
+    sessionToUpdateOwnState.writeTransaction(tx => {
+      //For each component
+      //First step - calculate the new state
+      //Second step - Update the own state with the new state
+      components.foreach(c=>{
+        val newState = worstState(sortedStateList,c)
+        tx.run(Neo4jQueries.UpdateOwnState(c,newState))
+      })
     })
 
-    session.close()
+    sessionToUpdateOwnState.close()
 
   }
 

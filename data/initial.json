@@ -6,8 +6,8 @@
       "own_state": "no_data",
       "derived_state": "no_data",
       "check_states": {
-        "CPU load": "no_data",
-        "RAM usage": "no_data"
+        "CPU_load": "no_data",
+        "RAM_usage": "no_data"
       },
       "depends_on": [
         "db"
@@ -18,8 +18,8 @@
       "own_state": "no_data",
       "derived_state": "no_data",
       "check_states": {
-        "CPU load": "no_data",
-        "RAM usage": "no_data"
+        "CPU_load": "no_data",
+        "RAM_usage": "no_data"
       },
       "dependency_of": [
         "app"
