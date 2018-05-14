@@ -1,13 +1,25 @@
 package training.neo4j.sts
 
+import org.neo4j.driver.v1.{StatementResult, Transaction}
+
 object Neo4jQueries {
+
+  def  constraintErrorQuery() = {
+
+    s"CREATE (c:Component {id:'app'})"
+
+
+  }
 
   def createConstraint(node: String, key: String): String = {
     s"CREATE CONSTRAINT ON (n:${node}) ASSERT n.${key} IS UNIQUE "
   }
 
   def writeComponent(component: Component): String = {
-    s"MERGE (:Component {id:'${component.id}',own_state: '${component.own_state}',derived_state:'${component.derived_state}',depends_on:'${component.depends_on}',dependency_of:'${component.dependency_of}'})"
+    //Thread.sleep(30000)
+    s"MERGE (c:Component {id:'${component.id}'})" +
+      s"ON CREATE SET c.own_state= '${component.own_state}', c.derived_state='${component.derived_state}', c.depends_on='${component.depends_on}', c.dependency_of='${component.dependency_of}'" +
+    s"ON MATCH SET c.own_state= '${component.own_state}', c.derived_state='${component.derived_state}', c.depends_on='${component.depends_on}', c.dependency_of='${component.dependency_of}'"
   }
 
   def writeChecks(check_id: String): String = {
@@ -22,12 +34,21 @@ object Neo4jQueries {
     s"MERGE(check1:Check {id:'${check_id}'}) MERGE(c1:Component{id:'${component.id}'}) MERGE(check1)-[:${check_state}]->(c1)"
   }
 
-  def writeDependencyRelation(id1: String, id2: String): String = {
-    s"MERGE(c1:Component{id:'${id1}'}) MERGE(c2:Component{id:'${id2}'}) MERGE(c1)-[:DEPENDS_ON]->(c2)"
+  //TODO How to have one or two parameters
+  def writeRelation(id1: String, id2: String, label1: String, label2:String, relation: String): String = {
+    s"MERGE(n1:${label1}{id:'${id1}'}) MERGE(n2:${label2}{id:'${id2}'}) MERGE(n1)-[:${relation}]->(n2)"
   }
 
   def deleteNode(node: String) ={
-    "MATCH (n) DETACH DELETE n"
+    s"MATCH (n:${node}) DETACH DELETE n"
+  }
+
+  def deleteConstraints(node: String, property: String) ={
+    s"DROP CONSTRAINT ON (n:${node}) ASSERT n.${property} IS UNIQUE"
+  }
+
+  def UpdateOwnState(component: Component,newState: String): String = {
+    s"MATCH (c:Component)" + s"WHERE c.id='${component.id}'" + s"SET c.own_state = '${newState}'"
   }
 
 }
