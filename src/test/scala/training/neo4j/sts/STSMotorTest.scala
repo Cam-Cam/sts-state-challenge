@@ -1,6 +1,8 @@
 package training.neo4j.sts
 
 import org.scalatest.FunSuite
+import training.neo4j.sts.jsonMotor.JsonParser
+import training.neo4j.sts.sts_concepts.{Component, Event, STSMotor}
 
 class STSMotorTest extends FunSuite {
 

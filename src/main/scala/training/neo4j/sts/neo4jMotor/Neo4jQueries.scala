@@ -1,6 +1,6 @@
-package training.neo4j.sts
+package training.neo4j.sts.neo4jMotor
 
-import org.neo4j.driver.v1.{StatementResult, Transaction}
+import training.neo4j.sts.sts_concepts.{Component, Event}
 
 object Neo4jQueries {
 

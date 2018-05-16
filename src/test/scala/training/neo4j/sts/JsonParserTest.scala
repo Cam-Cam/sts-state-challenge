@@ -1,6 +1,7 @@
 package training.neo4j.sts
 
 import org.scalatest.FunSuite
+import training.neo4j.sts.jsonMotor.JsonParser
 
 import scala.io.Source
 

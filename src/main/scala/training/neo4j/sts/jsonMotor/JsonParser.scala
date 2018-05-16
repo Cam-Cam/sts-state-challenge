@@ -1,12 +1,10 @@
-package training.neo4j.sts
+package training.neo4j.sts.jsonMotor
 
 import java.io.FileInputStream
 
-import org.json4s
-import org.json4s.{DefaultFormats, Formats, JObject, JValue}
 import org.json4s.jackson.JsonMethods.parse
-
-import scala.collection.immutable
+import org.json4s.{DefaultFormats, JValue}
+import training.neo4j.sts.sts_concepts.{Component, Event}
 
 object JsonParser{
 

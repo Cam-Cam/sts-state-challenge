@@ -1,4 +1,4 @@
-package training.neo4j.sts
+package training.neo4j.sts.sts_concepts
 
 case class Component(id: String,
                      own_state: String,
