@@ -2,7 +2,7 @@ name := "sts-state-challenge"
 
 version := "0.1"
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.1"
 
 libraryDependencies += "org.neo4j.driver" % "neo4j-java-driver" % "1.5.1"
 

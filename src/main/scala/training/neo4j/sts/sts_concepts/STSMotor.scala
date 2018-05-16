@@ -3,6 +3,7 @@ package training.neo4j.sts.sts_concepts
 import org.neo4j.driver.v1._
 import training.neo4j.sts.neo4jMotor.Neo4jQueries
 
+
 import scala.collection.JavaConverters._
 
 case class STSMotor(
