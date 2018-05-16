@@ -1,6 +1,8 @@
 package training.neo4j.sts
 
 import org.scalatest.FunSuite
+import training.neo4j.sts.jsonMotor.JsonParser
+import training.neo4j.sts.sts_concepts.{Component, Event, STSMotor}
 
 class STSMotorTest extends FunSuite {
 
@@ -10,8 +12,8 @@ class STSMotorTest extends FunSuite {
 
   val stsMotor: STSMotor = STSMotor(uri,user,password)
 
-  val components: List[Component] = JsonParser.createComponent(JsonParser.readInitFile("src/test/ressources/initial.json"))
-  val events: List[Event] = JsonParser.createEvent(JsonParser.readEventFile("src/test/ressources/events.json"))
+  val components: List[Component] = JsonParser.createComponent(JsonParser.readInitFile("src/test/resources/initial.json"))
+  val events: List[Event] = JsonParser.createEvent(JsonParser.readEventFile("src/test/resources/events.json"))
 
   val components3: List[Component] = JsonParser.createComponent(JsonParser.readInitFile("src/test/ressources/init3.json"))
   val events3: List[Event] = JsonParser.createEvent(JsonParser.readEventFile("src/test/ressources/events3.json"))

@@ -1,19 +1,26 @@
 package training.neo4j.sts
 
-object EntryPoint extends App{
+import training.neo4j.sts.jsonMotor.JsonParser
+import training.neo4j.sts.neo4jMotor._
+import training.neo4j.sts.argument_validator.Config
+import training.neo4j.sts.sts_concepts.{Component, Event, STSMotor}
 
-  override def main(args: Array[String]): Unit = {
+object EntryPoint extends App {
 
-    val components: List[Component] = JsonParser.createComponent(JsonParser.readInitFile(args(0)))
-    val events: List[Event] = JsonParser.createEvent(JsonParser.readEventFile(args(1)))
+  val config: Config = Config(args)
 
-    val uri: String = "bolt://localhost:7687"
-    val user: String = "neo4j"
-    val password: String = "231287"
+  val neo4j: Neo4jParameters = Neo4jParameters()
 
-    val stsMotor: STSMotor = STSMotor(uri, user, password)
-    stsMotor.init(components)
-  }
+  val initFile: String = config.initPath
+  val eventFile: String = config.eventPath
+
+  val components: List[Component] = JsonParser.createComponent(JsonParser.readInitFile(initFile))
+  val events: List[Event] = JsonParser.createEvent(JsonParser.readEventFile(eventFile))
+
+
+  val stsMotor: STSMotor = STSMotor(neo4j.uri, neo4j.user, neo4j.password)
+  stsMotor.init(components)
+  stsMotor.update(events, components)
 
 
 }

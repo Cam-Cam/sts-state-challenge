@@ -1,4 +1,4 @@
-package training.neo4j.sts
+package training.neo4j.sts.sts_concepts
 
 case class Event(timestamp: String,
                  component: String,

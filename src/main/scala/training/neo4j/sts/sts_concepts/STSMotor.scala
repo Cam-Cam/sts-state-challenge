@@ -1,7 +1,8 @@
-package training.neo4j.sts
+package training.neo4j.sts.sts_concepts
 
-import com.sun.xml.internal.bind.v2.TODO
 import org.neo4j.driver.v1._
+import training.neo4j.sts.neo4jMotor.Neo4jQueries
+
 
 import scala.collection.JavaConverters._
 
