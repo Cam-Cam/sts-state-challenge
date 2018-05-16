@@ -1,7 +1,7 @@
 package training.neo4j.sts.sts_concepts
 
 import org.neo4j.driver.v1._
-import training.neo4j.sts.neo4jMotor.Neo4jQueries
+import training.neo4j.sts.neo4j_motor.Neo4jQueries
 
 
 import scala.collection.JavaConverters._
@@ -83,9 +83,7 @@ case class STSMotor(
       //Second step - create new events relations between component and check
       events.foreach(e => {
         tx.run(Neo4jQueries.deleteStateRelation(e))
-        println(s"DELETE STATE RELATION between COMPONENT ${e.component} and check_state ${e.check_state}")
         tx.run(Neo4jQueries.writeRelation("Check", e.check_state, "Component", e.component, e.state))
-        println(s"WRITE RELATION ${e.state} FROM CHECK_STATE ${e.check_state} to COMPONENT ${e.component}")
       })
     })
 
@@ -98,7 +96,6 @@ case class STSMotor(
       components.foreach(c=>{
         val newState = worstState(sortedStateList,c)
         tx.run(Neo4jQueries.UpdateOwnState(c,newState))
-        println(s"UPDATE OWN_STATE OF COMPONENT ${c.id} TO ${c.own_state}")
       })
     })
 

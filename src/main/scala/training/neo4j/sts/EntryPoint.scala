@@ -1,7 +1,7 @@
 package training.neo4j.sts
 
 import training.neo4j.sts.jsonMotor.JsonParser
-import training.neo4j.sts.neo4jMotor._
+import training.neo4j.sts.neo4j_motor._
 import training.neo4j.sts.argument_validator.Config
 import training.neo4j.sts.sts_concepts.{Component, Event, STSMotor}
 
