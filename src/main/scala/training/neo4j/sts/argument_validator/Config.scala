@@ -14,7 +14,7 @@ object Config {
 
       opt[String]('i', "init_component_path").required().action((x, c) => c.copy(initPath = x)).text("Path to json file with components and dependencies to create")
 
-      opt[String]('h', "eventd_path").required().action((x, c) => c.copy(eventPath = x)).text("Path to json file with events to modify components.")
+      opt[String]('e', "events_path").required().action((x, c) => c.copy(eventPath = x)).text("Path to json file with events to modify components.")
 
     }
 
