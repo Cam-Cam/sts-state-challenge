@@ -12,8 +12,8 @@ class STSMotorTest extends FunSuite {
 
   val stsMotor: STSMotor = STSMotor(uri,user,password)
 
-  val components: List[Component] = JsonParser.createComponent(JsonParser.readInitFile("src/test/ressources/initial.json"))
-  val events: List[Event] = JsonParser.createEvent(JsonParser.readEventFile("src/test/ressources/events.json"))
+  val components: List[Component] = JsonParser.createComponent(JsonParser.readInitFile("src/test/resources/initial.json"))
+  val events: List[Event] = JsonParser.createEvent(JsonParser.readEventFile("src/test/resources/events.json"))
 
 
   test("Initialization with tests files create 2 constraints"){
