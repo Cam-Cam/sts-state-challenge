@@ -3,7 +3,6 @@
 bin/
 project/
 target/
-build.sbt
 
 # intellij idea
 *.log
