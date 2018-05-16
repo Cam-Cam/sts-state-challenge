@@ -73,32 +73,36 @@ case class STSMotor(
 
   def update(events: List[Event],components: List[Component]) ={
 
-    val sessionToUpdateRelationsSession: Session = driver.session()
+    val sessionToUpdateRelations: Session = driver.session()
     val sessionToUpdateOwnState: Session = driver.session()
+    val sessionToUpdateData:Session = driver.session()
 
-    sessionToUpdateRelationsSession.writeTransaction(tx => {
+    sessionToUpdateRelations.writeTransaction(tx => {
       //For each event
       //First step - delete existing events relations between component and check
       //Second step - create new events relations between component and check
       events.foreach(e => {
         tx.run(Neo4jQueries.deleteStateRelation(e))
+        println(s"DELETE STATE RELATION between COMPONENT ${e.component} and check_state ${e.check_state}")
         tx.run(Neo4jQueries.writeRelation("Check", e.check_state, "Component", e.component, e.state))
+        println(s"WRITE RELATION ${e.state} FROM CHECK_STATE ${e.check_state} to COMPONENT ${e.component}")
       })
     })
 
-    sessionToUpdateRelationsSession.close()
+    sessionToUpdateRelations.close()
 
-    sessionToUpdateOwnState.writeTransaction(tx => {
+    sessionToUpdateData.writeTransaction(tx => {
       //For each component
       //First step - calculate the new state
       //Second step - Update the own state with the new state
       components.foreach(c=>{
         val newState = worstState(sortedStateList,c)
         tx.run(Neo4jQueries.UpdateOwnState(c,newState))
+        println(s"UPDATE OWN_STATE OF COMPONENT ${c.id} TO ${c.own_state}")
       })
     })
 
-    sessionToUpdateOwnState.close()
+    sessionToUpdateData.close()
 
   }
 
