@@ -1,4 +1,4 @@
-package training.neo4j.sts.neo4jMotor
+package training.neo4j.sts.neo4j_motor
 
 import java.util.Properties
 
