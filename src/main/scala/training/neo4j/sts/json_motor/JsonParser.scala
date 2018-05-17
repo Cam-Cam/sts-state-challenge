@@ -1,4 +1,4 @@
-package training.neo4j.sts.jsonMotor
+package training.neo4j.sts.json_motor
 
 import java.io.FileInputStream
 
